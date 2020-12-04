@@ -138,7 +138,7 @@ async def check_auth(request: Request):
 
     _, token = token.split(' ')
     try:
-        payload = jwt.decode(token, 'foo', algorithm=['HS256'])
+        payload = jwt.decode(token, SECRET_KEY, algorithm=['HS256'])
     except (jwt.DecodeError, jwt.ExpiredSignatureError):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

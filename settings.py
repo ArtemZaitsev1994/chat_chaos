@@ -9,7 +9,7 @@ os.makedirs(PHOTO_PATH, exist_ok = True)
 os.makedirs(FILES_PATH, exist_ok = True)
 
 
-SECRET_KEY = 'wa5kp7d)3vp5y#jb*m5y=#tt+c9tqzw#0c+21rp)w9o)(qn!5^'
+SECRET_KEY =  os.environ.get('POSTGRES_HOST', 'foo')
 
 NEW_CHATS_PER_DAY_LIMIT = 15
 
