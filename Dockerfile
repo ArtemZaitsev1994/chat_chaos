@@ -12,6 +12,7 @@ RUN apk update && apk add gcc postgresql-dev dos2unix musl-dev libc-dev make lib
 && pip3 install --upgrade --no-cache-dir pip setuptools==49.6.0 \
 && pip install psycopg2-binary==2.8.6
 
+COPY ./requirements.txt .
 RUN pip install -r requirements.txt
 
 COPY . .

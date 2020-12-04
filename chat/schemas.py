@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Dict
 from uuid import UUID
 from datetime import datetime
 
@@ -22,7 +22,7 @@ class MessageRead(MessageCreate):
 
 class ChatRoomRead(BaseModel):
     id: UUID
-    users: List[UUID]
+    interlocutor: dict
     last_mess: Optional[MessageRead]
 
     class Config:
@@ -42,3 +42,23 @@ class CommonResponse(BaseModel):
 
 class AccessOpen(BaseModel):
     room_id: str
+
+
+class ChatRoomList(CommonResponse):
+    class Payload(BaseModel):
+        self_info: dict
+        rooms: List[ChatRoomRead]
+
+    payload: Payload
+
+
+
+
+
+
+
+
+
+
+
+

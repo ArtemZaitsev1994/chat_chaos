@@ -8,8 +8,18 @@ AVAILABLE_IMG_EXTENSTION = ['png', 'jpg', 'jpeg']
 os.makedirs(PHOTO_PATH, exist_ok = True)
 os.makedirs(FILES_PATH, exist_ok = True)
 
-MAIN_SERVER_URL = 'http://127.0.0.1:8000'
 
 SECRET_KEY = 'wa5kp7d)3vp5y#jb*m5y=#tt+c9tqzw#0c+21rp)w9o)(qn!5^'
 
 NEW_CHATS_PER_DAY_LIMIT = 15
+
+POSTGRES_HOST = os.environ.get('POSTGRES_HOST', 'localhost')
+POSTGRES_USER = os.environ.get('POSTGRES_USER', 'postgres')
+POSTGRES_PASSWORD = os.environ.get('POSTGRES_PASSWORD', 'postgres')
+POSTGRES_PORT = os.environ.get('POSTGRES_PORT', 5432)
+DATABASE = os.environ.get('DATABASE', 'postgres')
+
+MONOLITH_HOST = os.environ.get('MONOLITH_HOST', 'http://127.0.0.1')
+MONOLITH_PORT = os.environ.get('MONOLITH_PORT', '8000')
+
+MAIN_SERVER_URL = f'{MONOLITH_HOST}:{MONOLITH_PORT}'

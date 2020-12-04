@@ -14,7 +14,7 @@ from sqlalchemy.orm import Session
 
 from core.utils import get_db
 from settings import PHOTO_PATH
-from .schemas import ChatRoomRead, MessageCreate, CommonResponse, AccessOpen
+from .schemas import ChatRoomRead, MessageCreate, CommonResponse, AccessOpen, ChatRoomList
 from .http_requests import get_user_info, get_list_users_info
 from .utils import row2dict, ConnectionManager, save_files, check_auth
 from .exceptions import UserNewChatLimit, UnsupportedMediaType
@@ -71,9 +71,8 @@ html = """
                 'files': []
             }
             chat_id = '342e1a32-2321-472e-b835-6c7a633b1fa1'
-            var ws = new WebSocket("ws://localhost:8001/ws");
+            var ws = new WebSocket("ws://localhost:8001/ws/%s/%s");
             ws.onopen = function(event) {
-                data = {'self_id': '%s', 'recipient': '%s'}
                 // ws.send(JSON.stringify(data))
                 prev_mess =  {
                     'page': current_page,
@@ -199,9 +198,9 @@ error_response = {
     'payload': None
 }
 
-@router.get("/user_1")
-async def get():
-    return HTMLResponse(html % ('6ec37deb-d87d-4c42-a0cd-3a29ac1cbb2d', '64e42832-d857-4e38-b1ad-c785157c3c12'))
+@router.get("/chat/{self_id}/{another}")
+async def get(self_id, another):
+    return HTMLResponse(html % (self_id, another))
 
 
 @router.get("/user_2")
@@ -211,8 +210,10 @@ async def get():
 
 websocket_manager = ConnectionManager()
 
-@router.websocket("/ws")
+@router.websocket("/ws/{current_user}/{recipient}")
 async def websocket_endpoint(
+    current_user: str,
+    recipient: str,
     websocket: WebSocket,
     db: Session = Depends(get_db)
 ):
@@ -222,7 +223,7 @@ async def websocket_endpoint(
 
     # TODO
     # init_data = await websocket.receive_json()
-    init_data = {'self_id': '09257933-84d5-43a9-afa3-31ea9e05ed72', 'recipient': '64e42832-d857-4e38-b1ad-c785157c3c12'}
+    init_data = {'self_id': current_user, 'recipient': recipient}
     if (values := list(init_data.values()))[0] == values[1]:
         return await websocket_manager.wrong_users_id_error(websocket)
 
@@ -364,7 +365,7 @@ async def websocket_endpoint(
         await websocket_manager.broadcast(chat_room.id, response)
 
 
-@router.post('/list_chat/', response_model=List[ChatRoomRead])
+@router.post('/list_chat/', response_model=ChatRoomList)
 async def get_list_chat(
     request: Request = Depends(check_auth),
     db: Session = Depends(get_db),
@@ -372,18 +373,43 @@ async def get_list_chat(
     offset: int = Body(...)
 ):
     """Get chat room list for user"""
-    chat_rooms = services.get_chat_list(db, request.state.user, limit=limit, offset=offset)
-    result = []
+    limit = min(limit, 100)
+    self_user_id = request.state.user
+    chat_rooms = services.get_chat_list(
+        db,
+        request.state.user,
+        limit=limit,
+        offset=offset
+    )
+    users = {str(_user.user) for room in chat_rooms for _user in room.users}
+    users =  await get_list_users_info({'users_uuid': users})
+
+    rooms = []
     for _chat in chat_rooms:
-        users = [row2dict(x) for x in _chat.users]
         last_mess = None
         if _chat.messages:
             last_mess = _chat.messages[0]
         chat = row2dict(_chat)
-        chat['users'] = [x['user'] for x in users]
+        chat['interlocutor'] = next(
+            (
+                users[_id]
+                for _user
+                in _chat.users
+                if (_id := str(_user.user)) != self_user_id
+            ),
+            None
+        )
         chat['last_mess'] = last_mess
-        result.append(chat)
-    return result
+        rooms.append(chat)
+
+    response = {
+        'payload': {
+            'self_info': users[self_user_id],
+            'rooms': rooms
+        }
+    }
+    response.update(success_response)
+    return response
 
 
 @router.post('/set_access_open/', response_model=CommonResponse)

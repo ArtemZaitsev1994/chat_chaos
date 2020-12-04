@@ -1,5 +1,5 @@
 import httpx
-from typing import List
+from typing import List, Dict
 
 from settings import MAIN_SERVER_URL
 
@@ -11,7 +11,13 @@ async def get_user_info(_uuid):
 
 async def get_list_users_info(users_uuid: List[str]):
     url = MAIN_SERVER_URL + '/api/authentication/v1/users_profiles/'
-    return await request_post(url, [200], users_uuid)
+    users = await request_post(url, [200], users_uuid)
+    users = {
+        user['id']: user
+        for user
+        in users
+    }
+    return users
 
 
 async def request_get(url, success_codes: list):
