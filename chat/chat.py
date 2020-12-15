@@ -71,7 +71,7 @@ html = """
                 'files': []
             }
             chat_id = '342e1a32-2321-472e-b835-6c7a633b1fa1'
-            var ws = new WebSocket("ws://localhost:8001/ws/%s/%s");
+            var ws = new WebSocket("ws://185.10.184.226:8001/ws/%s/%s");
             ws.onopen = function(event) {
                 // ws.send(JSON.stringify(data))
                 prev_mess =  {
