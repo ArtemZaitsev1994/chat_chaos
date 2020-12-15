@@ -6,8 +6,7 @@ app = FastAPI()
 app.include_router(routes)
 
 origins = [
-    "http://localhost",
-    "http://localhost:3001",
+    "*",
 ]
 
 app.add_middleware(
