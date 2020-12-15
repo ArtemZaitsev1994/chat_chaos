@@ -382,7 +382,9 @@ async def get_list_chat(
         offset=offset
     )
     users = {str(_user.user) for room in chat_rooms for _user in room.users}
-    users =  await get_list_users_info({'users_uuid': users})
+    if not users:
+        users = {self_user_id}
+    users = await get_list_users_info({'users_uuid': users})
 
     rooms = []
     for _chat in chat_rooms:

@@ -9,9 +9,10 @@ async def get_user_info(_uuid):
     return await request_get(url.format(_uuid), [200])
 
 
-async def get_list_users_info(users_uuid: List[str]):
+async def get_list_users_info(users_uuid: Dict[str, List[str]]):
     url = MAIN_SERVER_URL + '/api/authentication/v1/users_profiles/'
-    users = await request_post(url, [200], users_uuid)
+    response = await request_post(url, [200], users_uuid)
+    users = response['payload']
     users = {
         user['id']: user
         for user
