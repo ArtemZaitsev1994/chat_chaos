@@ -13,11 +13,22 @@ origins = [
 ]
 
 headers = [
+    'access-control-allow-credentials',
+    'access-control-allow-headers,'
+    'accept',
+    'ccept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
     'Access-Control-Allow-Headers',
     'Access-Control-Allow-Credentials',
-    'Access-Control-Allow-Origin',
-    'Access-Control-Allow-Methods',
-    'set-cookie'
+    'set-cookie',
+    'access-control-allow-methods',
+    'access-control-allow-origin',
 ]
 
 app.add_middleware(
