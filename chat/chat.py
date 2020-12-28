@@ -240,7 +240,7 @@ async def websocket_endpoint(
             return await websocket_manager.access_denied_error(websocket)
 
     # Запрашиваем данные о пользователях с сервера аутентификации
-    users = await get_list_users_info({'users_uuid': [str(x.user) for x  in chat_room.users]})
+    users = await get_list_users_info({'users_ids': [str(x.user) for x in chat_room.users]})
     if len(users) != 2:
         return await websocket_manager.wrong_users_id_error(websocket)
 
@@ -384,7 +384,7 @@ async def get_list_chat(
     users = {str(_user.user) for room in chat_rooms for _user in room.users}
     if not users:
         users = {self_user_id}
-    users = await get_list_users_info({'users_uuid': users})
+    users = await get_list_users_info({'users_ids': list(users)})
 
     rooms = []
     for _chat in chat_rooms:
